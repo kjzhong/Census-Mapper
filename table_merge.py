@@ -2,6 +2,8 @@
 # To run -
 # ipython -i table_merge.py
 
+# Todo - Add back the starter code to turn the shp file to geojson
+# Todo - Add link to find the POA_2016_AUST files
 
 import numpy as np
 import pandas as pd
