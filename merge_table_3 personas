@@ -1,0 +1,231 @@
+#!/usr/bin/env python
+# coding: utf-8
+
+# In[15]:
+
+
+import numpy as np
+import pandas as pd
+import functools
+
+
+# ## Step 1: Importing the Data
+
+# In[131]:
+
+
+dataCols = ["01","02","04A","04B","10A","10B","10C","13A","13B","15","17A","17B","17C","18","25","28","30","57A","57B","59"]
+
+names = []
+d = {}
+for i in range(len(dataCols)):
+    name = "2016 Census GCP Postal Areas for NSW/2016Census_"+"G"+dataCols[i]+"_NSW_POA.csv"
+    names.append(name)
+    d["dataG" + str(dataCols[i])] = pd.read_csv(names[i])
+
+#list(d.values())
+
+
+# ## Step 2: Merge all of the tables by post code + checking missing data
+
+# In[132]:
+
+
+df_merged = functools.reduce(lambda  left,right: pd.merge(left,right,on=['POA_CODE_2016'],
+                                            how='inner'), list(d.values()))
+
+print(df_merged.isnull().values.any())
+df_merged
+
+
+# ## Step 3:Subetting out which Columns we want to look at (~~Domain~~ Persona Specific) 
+#  
+#  
+# Assumptions:  Median income in 2018 across all age groups were $1,110 ( which could theoretically split it by age bracket aswell.)
+#  https://www.abs.gov.au/statistics/labour/earnings-and-work-hours/average-weekly-earnings-australia/latest-release
+#  
+#  
+# **Make G30 and G59 On its own**
+#  
+#  
+# ### Persona 1: People who are too young to have licenses & and dont wanna use uber/taxis
+# 
+# * Primary school, high school, uni
+# * Price sensitive
+# * Student, young adult
+# * More tech savvy, uses mobile phone
+# 
+# 
+# #### The tables & columns we assess this off
+# G01: Age_15_19_yr_P , Age_20_24_yr_P (these include the 15-24 in education + non-education)   
+# G02: Median_tot_prsnl_inc_weekly    
+# G04: Ages ranges are too granular and nothing included  
+# G15: This shows Type of educational institute (not important)  
+# G17: P_Neg_Nil_income_15_19_yrs,P_Neg_Nil_income_20_24_yrs,P_1_149_15_19_yrs,P_1_149_20_24_yrs,P_150_299_15_19_yrs, P_150_299_20_24_yrs, P_300_399_15_19_yrs, P_300_399_20_24_yrs,P_400_499_15_19_yrs,P_400_499_20_24_yrs,P_500_649_15_19_yrs, P_500_649_20_24_yrs, P_650_799_15_19_yrs, P_650_799_20_24_yrs, P_800_999_15_19_yrs, P_800_999_20_24_yrs, P_1000_1249_15_19_yrs, P_1000_1249_20_24_yrs ( this will account for all 15-24 year olds who earn under the National weekly median of $1110)   
+# G18: Core activity need for assistance? P_15_19_Need_for_assistance, P_20_24_Need_for_assistance ( prob unrelated though...)   
+# G57: Does their occupation matter? I mean these guys are young 
+# G59: I expect how they travel to work shouldn't matter either
+# 
+# ### Persona 2: Older individuals who lack motor skills but still need reliable transport ( This is just 1 table...)
+# 
+# * Retiree
+# * 60+
+# * Reflexes/sight/driving skills are getting poor
+# * Health issues preventing them from being able to drive
+# * They also might not have a lot of money
+# 
+# #### The tables & columns we assess this off
+# 
+# 
+# ### Persona 3: Immigrants / Low income individuals who may have new immigrated (IDK how i feel about this)
+# 
+# * They might not have a car
+# * They might have language barriers
+# * They might find the process to get a license challenging
+# * They might find the process to get a car (insurance, etc) challenging
+# 
+# 
+# #### The tables & columns we assess this off
+# 
+# 
+# ### Persona 4: Travel Disadvantaged
+# 
+# * Indigenous People
+# * People with many young children (single parents)
+# * Disabled people ( need care )
+# * People with no cars at home
+# * People living in low-density areas (lack of network effect)
+# 
+# 
+# #### The tables & columns we assess this off
+# 
+# G01: Indigenous_P_Tot_P  
+# G02: Average_household_size  
+# G10: Tot_2011 - Tot_2016  
+# G18: P_55_64_Need_for_assistnce,P_65_74_Need_for_assistance,P_75_84_Need_for_assistance,P_85_over_Need_for_assistance  
+# G25: OPF_ChU15_a_Total_F (One_parent_family_with_children_under_15_and_Total_Families)  
+# G30: Num_MVs_per_dweling_0_MVs,Num_MVs_per_dweling_1_MVs  
+# Total population
+# 
+# 
+
+# In[133]:
+
+
+persona1d={}
+persona2d={}
+persona3d={}
+persona4d={}
+
+str1 = "POA_CODE_2016"
+str2 = "Tot_P_P"
+
+# Persona 1 : The young kid with no much income
+persona1d["str1"]="POA_CODE_2016"
+persona1d["str2"]="Tot_P_P"
+p1 = "Age_15_19_yr_P,Age_20_24_yr_P,Median_tot_prsnl_inc_weekly,P_Neg_Nil_income_15_19_yrs,P_Neg_Nil_income_20_24_yrs,P_1_149_15_19_yrs,P_1_149_20_24_yrs,P_150_299_15_19_yrs,P_150_299_20_24_yrs,P_300_399_15_19_yrs,P_300_399_20_24_yrs,P_400_499_15_19_yrs,P_400_499_20_24_yrs,P_500_649_15_19_yrs,P_500_649_20_24_yrs,P_650_799_15_19_yrs,P_650_799_20_24_yrs,P_800_999_15_19_yrs,P_800_999_20_24_yrs,P_1000_1249_15_19_yrs,P_1000_1249_20_24_yrs"
+p1 = p1.strip()
+for i in range(len(p1.split(","))):
+    persona1d["str"+str(i+3)]=p1.split(",")[i]
+
+persona1d
+# Persona 2: older people who need assistance with care (income not a concern)
+persona2d["str1"]="POA_CODE_2016"
+persona2d["str2"]="Tot_P_P"
+
+
+
+#Persona 4: Any Travel Disadvantaged qualities
+persona4d["str1"]="POA_CODE_2016"
+persona4d["str2"]="Tot_P_P"
+persona4d["str3"]="Indigenous_P_Tot_P"
+persona4d["str4"]="Average_household_size"
+persona4d["str5"]="Tot_2011"
+persona4d["str6"]="Tot_2012"
+persona4d["str7"]="Tot_2013"
+persona4d["str8"]="Tot_2014"
+persona4d["str9"]="Tot_2015"
+persona4d["str10"]="Tot_2016"
+persona4d["str11"]="P_55_64_Need_for_assistance"
+persona4d["str12"]="P_65_74_Need_for_assistance"
+persona4d["str13"]="P_75_84_Need_for_assistance"
+persona4d["str14"]="P_85_over_Need_for_assistance"
+persona4d["str15"]="OPF_ChU15_a_Total_F"
+persona4d["str16"]="Num_MVs_per_dweling_0_MVs"
+persona4d["str17"]="Num_MVs_per_dweling_1_MVs"
+
+
+
+
+# In[112]:
+
+
+#Persona 1
+
+#Subsetting the relevant rows
+persona1_table = df_merged.loc[:,persona1d.values()]
+
+#Merging and dropping the columns
+persona1_table["Number of 15-24 Year olds under (National) Median Income"] = persona1_table.loc[:,"P_Neg_Nil_income_15_19_yrs":'P_1000_1249_20_24_yrs'].sum(axis=1)
+persona1_table["Number of 15-24 Year Olds"] = persona1_table.loc[:,"Age_15_19_yr_P":"Age_20_24_yr_P"].sum(axis=1)
+persona1_table.drop(columns=persona1_table.loc[:,"P_Neg_Nil_income_15_19_yrs":"P_1000_1249_20_24_yrs"],inplace = True)
+persona1_table.drop(columns=persona1_table.loc[:,"Age_15_19_yr_P":"Age_20_24_yr_P"],inplace = True)
+
+persona1_table
+
+
+# In[138]:
+
+
+#Persona 4
+
+#Subsetting the relevant rows
+persona4_table = df_merged.loc[:,persona4d.values()]
+
+#Merging and dropping the columns
+persona4_table["Total Number Of Immigrants since 2011"]=persona4_table.loc[:,"Tot_2011":"Tot_2016"].sum(axis=1)
+persona4_table["55 and Older who need assistance (disabled)"]=persona4_table.loc[:,"P_55_64_Need_for_assistance":"P_85_over_Need_for_assistance"].sum(axis=1)
+persona4_table["Number of people with 1 or less cars"]=persona4_table.loc[:,"Num_MVs_per_dweling_0_MVs":"Num_MVs_per_dweling_1_MVs"].sum(axis=1)
+
+persona4_table.drop(columns=persona4_table.loc[:,"Tot_2011":"Tot_2016"],inplace = True)
+persona4_table.drop(columns=persona4_table.loc[:,"P_55_64_Need_for_assistance":"P_85_over_Need_for_assistance"],inplace = True)
+persona4_table.drop(columns=persona4_table.loc[:,"Num_MVs_per_dweling_0_MVs":"Num_MVs_per_dweling_1_MVs"],inplace = True)
+
+
+persona4_table
+
+
+# ## Step 3b : Data manipulations ( Domain specific )  
+# 1. Aggregate all of the income columns - should we aggregate it? or instead look at a subset of pop.
+# 2. Aggregate all the education columns - should we aggregate it? or instead look at a subset of pop.
+# 3. Sort depending on what we are after
+
+# ## Step 4: Subsetting and ranking
+# 1. Getting the columns of interest ( aggregated or not) 
+# 2. Assign a rank to each postcode based on their position within each column
+# 3. Sum up the ranks to get an overal "point" criteria
+
+# In[67]:
+
+
+for i in df3.columns[1:]:
+    df3[str(i) + " Rank" ] = df3[i].rank(method = "dense", pct = False) 
+
+#This can be extended for all the aggregated rank columns  
+# weights would have to be applied manually by dividing each column by an integer...
+df3["Overall Criteria Score"] = df3.loc[:,"Total Students Rank":"Total Families Under Median Rank"].sum(axis=1)
+#df3.sort_values("Overall Criteria Score")
+#df3.tail(10)
+
+
+# In[68]:
+
+
+df3
+
+
+# # Main Questions  
+# 1. How rigid are our assumptions, do we need to justify our assumptions? i.e. **all school kids will be using our product**  
+# 2. Should we subset it rather than looking at aggregates? If so, what weighting do we apply to each subset? e.g. **do we want to only look at 15-24 y.o. uni students who study Full time only against those who study part time?**  
+# 
+# 3. Which values do we sort by first? How to decide which are most important? e.g. **Is poor families or total students more important? Are we going to sort it or assign some sort of criteia to create a ranking and subsequent rank?** 
