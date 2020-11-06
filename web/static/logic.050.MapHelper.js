@@ -7,19 +7,19 @@ class MapHelper {
 	static readTable(columnIndex) {
 		$.get(globalFilename, function (personaCSVString) {
 			var customerPersonas = Papa.parse(personaCSVString);
-
+			// globalTest = customerPersonas;
 
 			globalColumnName = customerPersonas["data"][0][columnIndex];
 
-			globalMinCount = 0;
-			globalMaxCount = 0;
+			globalMinCount = NaN;
+			globalMaxCount = NaN;
 
 			for (var i = 1; i < customerPersonas.data.length; i++) {
 
 				// Generate our dictionary, then add each row to the global postcode dictionary
 				// i is the row, 0 is the column
 				var thisPostcode = customerPersonas.data[i][0];
-				var thisValue = parseFloat(customerPersonas.data[i][columnIndex]);
+				var thisValue = customerPersonas.data[i][columnIndex];
 
 				globalPostcodeDictionary[thisPostcode] = thisValue;
 
@@ -38,16 +38,21 @@ class MapHelper {
 		$.get("postcodes-geojson/au-postcodes-Visvalingam-0.1.geojson", function (incomingGeoJSON) {
 
 			var postcodeBoundaries = JSON.parse(incomingGeoJSON);
+
+			// Strip old (coloured) tiles
 			if (globalMyLayer) { globalMyLayer.removeFrom(globalMapObject) };
 
+
+			// Define each postcode's properties
 			for (var i = 0; i < postcodeBoundaries.features.length; i++) {
 				var thisPostCode = postcodeBoundaries["features"][i]["properties"]["POA_CODE16"];
 
-				var thisPostcodePeople = globalPostcodeDictionary[thisPostCode];
+				// Read score from global dictionary (see MapHelper.readTable) and calculate colour
+				var thisPostcodeScore = globalPostcodeDictionary[thisPostCode];
 				var thisPostCodePeoplRelativePosition = ColourHelper.valueToPercentile(
 					globalMinCount,
 					globalMaxCount,
-					thisPostcodePeople
+					thisPostcodeScore
 				);
 				postcodeBoundaries["features"][i]["properties"]["relativePosition"] = thisPostCodePeoplRelativePosition;
 
@@ -60,8 +65,10 @@ class MapHelper {
 
 				// Add our colours and the score as a property of each post code feature
 				postcodeBoundaries["features"][i]["properties"]["style"] = thisStyle;
-				postcodeBoundaries["features"][i]["properties"]["thisColumnValue"] = thisPostcodePeople;
+				postcodeBoundaries["features"][i]["properties"]["thisColumnValue"] = thisPostcodeScore;
 			}
+
+			// globalTest = postcodeBoundaries;
 
 			var settings = {
 				onEachFeature: function (feature, layer) {
@@ -77,7 +84,7 @@ class MapHelper {
 
 
 					if (feature.properties && feature.properties["thisColumnValue"]) {
-						preparedString += "<br /><em>" + globalColumnName + ": " + feature.properties["thisColumnValue"] + "</em>";
+						preparedString += "<br /><em>(" + globalColumnName + ") Percentile: " + feature.properties["thisColumnValue"] + "</em>";
 					}
 
 					if (preparedString.length > 0) {

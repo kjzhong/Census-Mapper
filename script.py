@@ -41,9 +41,8 @@ for tab in dataTabs:
 
 df_merged = functools.reduce(lambda left, right: pd.merge(left, right, on=['POA_CODE_2016'],
                                                           how='inner'), list(d.values()))
-
 df_merged = df_merged[df_merged["Tot_P_P"] != 0]
-
+# print(df_merged.isnull().values.any())
 
 # ## Step 2(b): Removing Excess Data Columns ( Attribute Specific)
 #
@@ -281,4 +280,5 @@ persona_df["POA_CODE_2016"] = persona_df["POA_CODE_2016"].astype("str")
 
 
 # ## Step 4: Export, Visualise and Communicate
-persona_df.to_csv('web/static/postcodes-data/persona_tables.csv', index=False)
+persona_df.to_csv('web/static/postcodes-data/persona_tables.csv',
+                  index=False, float_format='%.8f')

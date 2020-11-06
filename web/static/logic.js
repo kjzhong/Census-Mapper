@@ -43,9 +43,7 @@ function bodyDidLoad() {
 
 	// Add column names to drop-down menu
 	$.get(globalFilename, function (personaCSVString) {
-		var customerPersonas = Papa.parse(personaCSVString);
-
-		// globalTest = customerPersonas;
+		var customerPersonas = Papa.parse(personaCSVString, { "dynamicTyping": true });
 
 		columnNames = customerPersonas["data"][0];
 
