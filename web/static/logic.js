@@ -7,7 +7,7 @@ var globalCurrentTiles;
 var globalPostcodeDictionary = {};
 var globalMinCount;
 var globalMaxCount;
-var globalFilename = "postcodes-data/one_score_for_each_persona_per_postcode_and_summed.csv";
+var globalFilename = "postcodes-data/persona_tables.csv";
 
 
 // Select which column in our customer-personas csv to visualise
@@ -26,7 +26,8 @@ var strongEndRGB = { red: 255, green: 0, blue: 0 };
 
 
 function bodyDidLoad() {
-	ShowtimeHelper.setDarkModeAccordingToBrowser();
+	globalCurrentTilesSelection = "CartoDB_Positron";
+	globalCurrentTiles = MapTileHelper.tileLayers[globalCurrentTilesSelection];
 	ShowtimeHelper.initialiseSelect2();
 
 	// OK - Ready to Initialise the map! :)
@@ -40,6 +41,7 @@ function bodyDidLoad() {
 	MapHelper.readTable(globalColumnSelector);
 
 
+	// Add column names to drop-down menu
 	$.get(globalFilename, function (personaCSVString) {
 		var customerPersonas = Papa.parse(personaCSVString);
 
@@ -54,6 +56,6 @@ function bodyDidLoad() {
 	})
 
 
-	// This snippet adds all the postcodes to the map
+	// Add all the postcodes to the map
 	MapHelper.parseMapfile();
 }

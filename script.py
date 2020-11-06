@@ -221,14 +221,14 @@ for i in persona_df.columns[1:]:
 persona_df["Youth Score"] = persona_df.loc[:, ["Number of 15-24 Year Olds",
                                                "Number of households with 1 or less cars",
                                                "Number of Households with more than 3 people",
-                                               "Number of people under Median income"]].sum(axis=1)
+                                               "Number of people under Median income"]].mean(axis=1)
 
 # Creating persona 2 score Senior Citizen
 # Aged 55 +
 # Still working, but may favour going to work in a taxi (traditional way of thinking)
 
 persona_df["Senior's Score"] = persona_df.loc[:, ["Number of people aged 55+",
-                                                  "Number of people who travel to work ONLY by Taxi"]].sum(axis=1)
+                                                  "Number of people who travel to work ONLY by Taxi"]].mean(axis=1)
 
 # Creating Persona 3 Indigenous Australians
 # Low population density
@@ -238,21 +238,21 @@ persona_df["Senior's Score"] = persona_df.loc[:, ["Number of people aged 55+",
 persona_df["Indigenous Score"] = persona_df.loc[:, ["Total Indigenous Population",
                                                     "Number of households with 1 or less cars",
                                                     "Number of people under Median income",
-                                                    "Total Population"]].sum(axis=1)
+                                                    "Total Population"]].mean(axis=1)
 
 # Creating Persona 4: Disabled Person
 # 14+ in age and disabled
 # Under median income
 
 persona_df["Disabled Score"] = persona_df.loc[:, ["Number of people aged 14 and old with a disability",
-                                                  "Number of people under Median income"]].sum(axis=1)
+                                                  "Number of people under Median income"]].mean(axis=1)
 
 
 # ### Combining the Persona Scores to form the equal weighted one
 #
-# Combining the score for **each** persona into one (equally weighted) averaged score. This score will tell us which postcodes have a high proportion of **four** customer segments.
+# Combining the score for **each** persona into one (equally weighted) averaged score. This score will tell us which postcodes might have a high proportion of **four** customer segments.
 #
-# A **higher** score signifes a **higher propotion**, where a **lower** score signifes a **smaller** proportion
+# A **higher** score suggests a **higher propotion**, where a **lower** score suggests a **smaller** proportion
 
 
 persona_df['Equal Weighted Score'] = persona_df.loc[:,
@@ -281,4 +281,4 @@ persona_df["POA_CODE_2016"] = persona_df["POA_CODE_2016"].astype("str")
 
 
 # ## Step 4: Export, Visualise and Communicate
-persona_df.to_csv('persona_tables.csv', index=False)
+persona_df.to_csv('web/static/postcodes-data/persona_tables.csv', index=False)
