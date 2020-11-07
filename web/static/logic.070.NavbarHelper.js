@@ -1,3 +1,12 @@
+class ShowtimeHelper {
+	static initialiseSelect2() {
+		$('#selectPlace').select2({
+			theme: 'bootstrap4',
+			width: '15rem',
+		});
+	}
+}
+
 class NavbarHelper {
 
 	/**

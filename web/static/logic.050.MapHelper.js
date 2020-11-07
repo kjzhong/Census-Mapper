@@ -36,13 +36,9 @@ class MapHelper {
 
 	static parseMapfile() {
 		$.get("postcodes-geojson/au-postcodes-Visvalingam-0.1.geojson", function (incomingGeoJSON) {
-
 			var postcodeBoundaries = JSON.parse(incomingGeoJSON);
-
 			// Strip old (coloured) tiles
 			if (globalMyLayer) { globalMyLayer.removeFrom(globalMapObject) };
-
-
 			// Define each postcode's properties
 			for (var i = 0; i < postcodeBoundaries.features.length; i++) {
 				var thisPostCode = postcodeBoundaries["features"][i]["properties"]["POA_CODE16"];
@@ -74,14 +70,12 @@ class MapHelper {
 				onEachFeature: function (feature, layer) {
 					// https://leafletjs.com/examples/geojson/
 
-
 					// Adds the on-click popup with relevant text
 					var preparedString = "";
 
 					if (feature.properties && feature.properties["POA_CODE16"]) {
 						preparedString += "<strong>" + feature.properties["POA_CODE16"] + "</strong>";
 					}
-
 
 					if (feature.properties && feature.properties["thisColumnValue"]) {
 						preparedString += "<br /><em>(" + globalColumnName + ") Percentile: " + feature.properties["thisColumnValue"] + "</em>";
@@ -95,9 +89,6 @@ class MapHelper {
 					if (feature.properties["style"]) {
 						layer.setStyle(feature.properties["style"]);
 					}
-
-					layer.layerID = feature.properties["POA_CODE16"];
-
 				}
 			}
 			globalMyLayer = L.geoJSON(postcodeBoundaries, settings).addTo(globalMapObject);

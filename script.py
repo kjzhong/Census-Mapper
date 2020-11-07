@@ -8,6 +8,8 @@
 import pandas as pd
 import functools
 
+from pandas.core.frame import DataFrame
+
 
 # ## Step 1: Importing the Data
 #
@@ -20,12 +22,10 @@ dataTabs = ["01", "02", "04A", "04B", "10A",
             "10B", "10C", "13A", "13B", "15",
             "17A", "17B", "17C", "18", "25",
             "28", "30", "31", "57A", "57B", "59"]
-names = []
 d = {}
 
 for tab in dataTabs:
     name = f"2016 Census GCP Postal Areas for AUST/2016Census_G{tab}_AUS_POA.csv"
-    names.append(name)
     d[f"dataG{tab}"] = pd.read_csv(name)
 
 
@@ -106,10 +106,9 @@ df_merged = df_merged[df_merged["Tot_P_P"] != 0]
 # Keep all this as a dictionary if we ever need to group by specific personas
 
 persona = {}
-
-# General Stuff
+# Postcode
 persona[0] = ["POA_CODE_2016"]
-# Population Density
+# Population
 persona[1] = ["Tot_P_P"]
 # People aged 15-24
 persona[2] = ["Age_15_19_yr_P", "Age_20_24_yr_P"]
@@ -119,14 +118,14 @@ persona[3] = ["Tot_2011", "Tot_2012", "Tot_2013",
 # People over the age of 55
 persona[4] = ["Age_55_64_yr_P", "Age_65_74_yr_P",
               "Age_75_84_yr_P", "Age_85ov_P"]
-# People over the age of 14 who need assitance with core activites/disabled
+# People over the age of 14 who need assistance with core activites
 persona[5] = ["P_15_19_Need_for_assistance", "P_20_24_Need_for_assistance", "P_25_34_Need_for_assistance", "P_35_44_Need_for_assistance",
               "P_45_54_Need_for_assistance", "P_55_64_Need_for_assistance", "P_65_74_Need_for_assistance", "P_75_84_Need_for_assistance", "P_85_over_Need_for_assistance"]
 # Number of single parent families with children under 15
 persona[6] = ["OPF_ChU15_a_Total_F"]
-# Households with less than one motor vehicle
+# Households with <= one motor vehicle
 persona[7] = ["Num_MVs_per_dweling_0_MVs", "Num_MVs_per_dweling_1_MVs"]
-# Households with more than 3 people
+# Households with >= 3 people
 persona[8] = ["Num_Psns_UR_3_Total", "Num_Psns_UR_4_Total",
               "Num_Psns_UR_5_Total", "Num_Psns_UR_6mo_Total"]
 # Indigenous Australians
@@ -143,6 +142,7 @@ persona[11] = ["Neg_Nil_inc_Tot",  "FI_1_149_Tot",  "FI_150_299_Tot",  "FI_300_3
 persona_l = []
 for i in persona.keys():
     persona_l.extend(persona[i])
+persona_df = df_merged.loc[:, persona_l]
 
 
 # ## Step 3: Data Manipulation
@@ -168,14 +168,11 @@ d_merge["Number of people under Median income"] = [
     "Neg_Nil_inc_Tot", "FI_800_999_Tot"]
 
 
-def sum_drop(df, name, start, end):
+def sum_drop(df: DataFrame, name: str, start: str, end: str) -> DataFrame:
     '''Sums the columns in df from start to end into a new column called name'''
     df[name] = df.loc[:, start:end].sum(axis=1)
     df = df.drop(columns=df.loc[:, start:end])
     return df
-
-
-persona_df = df_merged.loc[:, persona_l]
 
 
 for key, value in d_merge.items():
@@ -194,10 +191,6 @@ persona_df = persona_df.rename(columns={'OPF_ChU15_a_Total_F': 'Single Parent Fa
 #
 # https://stats.stackexchange.com/questions/70801/how-to-normalize-data-to-0-1-range
 #
-
-
-# Removing POA for ease of use
-persona_df['POA_CODE_2016'] = persona_df['POA_CODE_2016'].str.strip('POA')
 
 # Calculating proportion of the population
 persona_df.iloc[:, 2:] = persona_df.iloc[:, 1:].div(
@@ -266,19 +259,19 @@ persona_df['Equal Weighted Score'] = persona_df.loc[:,
 
 
 cols = persona_df.columns.tolist()
-
-
 # Reordering the columns
 cols = persona_df.columns.tolist()
 cols = [cols[0]] + [cols[-1]] + cols[-2:0:-1]
 persona_df = persona_df[cols]
 
-# Changing Postcodes to "string" object, such that the leading zeroes will not be removed in the CSV
-persona_df["POA_CODE_2016"] = persona_df["POA_CODE_2016"].astype("str")
-
-# persona_df
-
 
 # ## Step 4: Export, Visualise and Communicate
+# Prepare our dataset for leaflet
+
+# Strip 'POA' to match geojson
+persona_df['POA_CODE_2016'] = persona_df['POA_CODE_2016'].str.strip('POA')
+# Changing Postcodes to "string" object, such that the leading zeroes will not be removed in the CSV
+persona_df["POA_CODE_2016"] = persona_df["POA_CODE_2016"].astype("str")
+# Some values got saved as scientific notation
 persona_df.to_csv('web/static/postcodes-data/persona_tables.csv',
                   index=False, float_format='%.8f')
