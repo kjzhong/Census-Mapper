@@ -6,10 +6,6 @@ This is the group assignment submission for T32020 INFS2822 M18A Team G. Team Me
 
 This code has two main components, Python, used for data manipulation, and HTML/CSS/Javascript for visualisation.
 
-Data in the repository has already been processed and is ready to visualise in leaflet. Datasources can be found on the ABS census datapacks site [here](https://datapacks.censusdata.abs.gov.au/datapacks/).
-
-Shapefiles can be found [here](https://www.abs.gov.au/AUSSTATS/abs@.nsf/DetailsPage/1270.0.55.003July%202016?OpenDocument), under "Postal Areas ASGS Ed 2016 Digital Boundaries in ESRI Shapefile Format". Geopandas can be used to convert the shapefiles to geojson.
-
 ## Installation
 
 Create a python virtual environment and use the package manager [pip](https://pip.pypa.io/en/stable/) to install required packages:
@@ -33,6 +29,13 @@ yarn install
 export FLASK_APP=app.py
 flask run
 ```
+
+## Data
+Data in the repository has already been processed and is ready to visualise in leaflet. Datasources can be found on the ABS census datapacks site [here](https://datapacks.censusdata.abs.gov.au/datapacks/).
+
+Shapefiles can be found [here](https://www.abs.gov.au/AUSSTATS/abs@.nsf/DetailsPage/1270.0.55.003July%202016?OpenDocument), under "Postal Areas ASGS Ed 2016 Digital Boundaries in ESRI Shapefile Format". Geopandas can be used to convert the shapefiles to geojson.
+
+[Mapshaper](https://www.npmjs.com/package/mapshaper) can be used to compress the geojson file.
 
 ## Acknowledgements
 
