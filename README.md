@@ -2,7 +2,9 @@
 
 ## Purpose
 
-This project is for the visualisation of arbitrary columns and summary statistics from an ABS Census Datapack in a cloropleth. The original use-case for this is then meant to be to guide decision-making based on multiple criteria, and generate visual reinforcement for presentations.
+This project is for the visualisation of arbitrary columns and summary statistics from an ABS Census Datapack in a cloropleth. Personas have also been created on summarising figures from multiple columns to discover areas in which vulnerable populations may exist in higher densities.
+
+The original use-case for this is then meant to be to guide decision-making based on multiple criteria, and generate visual reinforcement for presentations.
 
 ## Installation
 
