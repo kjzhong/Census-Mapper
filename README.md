@@ -1,10 +1,8 @@
 # infs2822-20t3-m18a-teamG
 
-## Group Assignment
+## Purpose
 
-This is the group assignment submission for T32020 INFS2822 M18A Team G. Team Members are Kevin Zhong, Albert Dai, Helen Liang, Junaid Javeed.
-
-This code has two main components, Python, used for data manipulation, and HTML/CSS/Javascript for visualisation.
+This project is for the visualisation of arbitrary columns and summary statistics from an ABS Census Datapack in a cloropleth. The original use-case for this is then meant to be to guide decision-making based on multiple criteria, and generate visual reinforcement for presentations.
 
 ## Installation
 
@@ -36,6 +34,12 @@ Data in the repository has already been processed and is ready to visualise in l
 Shapefiles can be found [here](https://www.abs.gov.au/AUSSTATS/abs@.nsf/DetailsPage/1270.0.55.003July%202016?OpenDocument), under "Postal Areas ASGS Ed 2016 Digital Boundaries in ESRI Shapefile Format". Geopandas can be used to convert the shapefiles to geojson.
 
 [Mapshaper](https://www.npmjs.com/package/mapshaper) can be used to compress the geojson file.
+
+## Contributors and Details
+
+This is the group assignment submission for T32020 INFS2822 M18A Team G. Team Members are Kevin Zhong, Albert Dai, Helen Liang, Junaid Javeed.
+
+This code has two main components, Python, used for data manipulation, and HTML/CSS/Javascript for visualisation.
 
 ## Acknowledgements
 
